@@ -15,11 +15,11 @@ import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
       envFilePath: ['.env.local', `.env.${process.env.NODE_ENV}`, '.env'],
       load: [...Object.values(config)],
     }),
-    // 避免暴力请求，限制同一个接口 10分钟内最多只能访问1000次
+    // 避免暴力请求，限制同一个接口 15分钟内最多只能访问1000次
     ThrottlerModule.forRootAsync({
       useFactory: () => ({
         errorMessage: '当前操作过于频繁，请稍后再试！',
-        throttlers: [{ ttl: minutes(10), limit: 1000 }],
+        throttlers: [{ ttl: minutes(15), limit: 1000 }],
       }),
     }),
   ],
