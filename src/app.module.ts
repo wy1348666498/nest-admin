@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import config from './config';
-import { minutes, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -15,13 +16,15 @@ import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
       envFilePath: ['.env.local', `.env.${process.env.NODE_ENV}`, '.env'],
       load: [...Object.values(config)],
     }),
-    // 避免暴力请求，限制同一个接口 15分钟内最多只能访问1000次
+    // 避免暴力请求，限制同一个接口 10内最多只能访问7次
     ThrottlerModule.forRootAsync({
       useFactory: () => ({
         errorMessage: '当前操作过于频繁，请稍后再试！',
-        throttlers: [{ ttl: minutes(15), limit: 1000 }],
+        throttlers: [{ ttl: seconds(10), limit: 7 }],
       }),
     }),
+    // 模块
+    SharedModule,
   ],
   controllers: [],
   providers: [

@@ -4,6 +4,8 @@ import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { fastifyApp } from './common/adapters/fastify.adapter';
 import { ConfigService } from '@nestjs/config';
 import { ConfigKeyPaths } from './config';
+import { LoggerService } from './shared/logger/logger.service';
+import { Logger } from '@nestjs/common';
 
 declare const module: any;
 
@@ -21,6 +23,7 @@ async function bootstrap() {
   // 获取 ConfigService 实例以访问配置
   const configService = app.get(ConfigService<ConfigKeyPaths>);
   const { port, globalPrefix } = configService.get('app', { infer: true });
+  app.useLogger(app.get(LoggerService));
 
   // 设置跨域
   app.enableCors({ origin: '*', credentials: true });
@@ -30,6 +33,9 @@ async function bootstrap() {
   // 启动应用并监听指定端口
   await app.listen(port, '0.0.0.0', async () => {
     const url = await app.getUrl();
+    const { pid } = process;
+    const logger = new Logger('NestApplication');
+    logger.log(`[${pid}] 服务===> ${url}`);
   });
 
   if (module.hot) {

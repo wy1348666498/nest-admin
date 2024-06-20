@@ -12,6 +12,16 @@ export const AppConfig = registerAs(appRegToken, () => ({
   globalPrefix: env('GLOBAL_PREFIX', ''),
   /** 语言 **/
   locale: env('APP_LOCALE', 'zh-CN'),
+
+  /** 日志配置 **/
+  logger: {
+    /** 日志级别 **/
+    level: env('LOGGER_LEVEL'),
+    /** 日志保留最大数 **/
+    maxFiles: envNumber('LOGGER_MAX_FILES'),
+    /** 存储路径 **/
+    logPath: env('LOGGER_PATH', './logs'),
+  },
 }));
 
 export type IAppConfig = ConfigType<typeof AppConfig>;
