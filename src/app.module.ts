@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import config from './config';
 import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TimeoutInterceptor } from './common/interceptors/timeout.interceptor';
 import { SharedModule } from './shared/shared.module';
+import { AllExceptionsFilter } from './common/filters/any-exception.filter';
 
 @Module({
   imports: [
@@ -28,6 +29,8 @@ import { SharedModule } from './shared/shared.module';
   ],
   controllers: [],
   providers: [
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+
     {
       provide: APP_INTERCEPTOR,
       useFactory: () => new TimeoutInterceptor(15 * 1000),

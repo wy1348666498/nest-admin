@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigKeyPaths } from './config';
 import { LoggerService } from './shared/logger/logger.service';
 import { Logger } from '@nestjs/common';
+import { isDev } from './global/env';
 
 declare const module: any;
 
@@ -23,12 +24,14 @@ async function bootstrap() {
   // 获取 ConfigService 实例以访问配置
   const configService = app.get(ConfigService<ConfigKeyPaths>);
   const { port, globalPrefix } = configService.get('app', { infer: true });
+  // 使用自定义日志服务
   app.useLogger(app.get(LoggerService));
-
   // 设置跨域
   app.enableCors({ origin: '*', credentials: true });
   // 设置全局前缀
   app.setGlobalPrefix(globalPrefix);
+  // 启用关闭钩子，使得应用程序能够监听关闭信号
+  !isDev && app.enableShutdownHooks();
 
   // 启动应用并监听指定端口
   await app.listen(port, '0.0.0.0', async () => {
