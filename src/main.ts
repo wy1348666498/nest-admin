@@ -7,6 +7,7 @@ import { ConfigKeyPaths } from './config';
 import { LoggerService } from './shared/logger/logger.service';
 import { Logger } from '@nestjs/common';
 import { isDev } from './global/env';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 declare const module: any;
 
@@ -26,6 +27,8 @@ async function bootstrap() {
   const { port, globalPrefix } = configService.get('app', { infer: true });
   // 使用自定义日志服务
   app.useLogger(app.get(LoggerService));
+  // 处理请求日志
+  app.useGlobalInterceptors(new LoggingInterceptor());
   // 设置跨域
   app.enableCors({ origin: '*', credentials: true });
   // 设置全局前缀
